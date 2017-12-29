@@ -1,4 +1,6 @@
 #!/usr/bin/env python2.7
+import logging 
+logging.basicConfig(filename="cursello.log", level=logging.DEBUG)
 
 import curses
 from curses.textpad import rectangle
@@ -26,23 +28,22 @@ curses.start_color()
 stdscr.refresh()
 
 def refresh_lists(stdscr, data, ilist, itemw):
+  stdscr.clear()
   at = 1
   for i, items in enumerate(data):
-    width = max(max(map(len, items.items) + [0]), len(items.name)) + 1
+    width = max(map(len, items.items) + [len(items.name)]) + 1
+    logging.debug("RECTANGLE {} {} {}".format(at-1, items.size+2, at+width))
+    #rectangle(stdscr, 0, at - 1, items.size + 2, at + width)
     rectangle(stdscr, 0, at - 1, items.size + 2, at + width)
-    if i == ilist:
-      stdscr.addstr(1, at, items.name, curses.A_UNDERLINE)
-      for j, item in enumerate(items.items):
-        if j == itemw:
-          stdscr.addstr(j + 2, at, item, curses.A_BOLD)
-        else:
-          stdscr.addstr(j + 2, at, item)
-    else:
-      y = 1
-      stdscr.addstr(y, at, items.name)
-      for j, item in enumerate(items.items):
-        y += 1
-        stdscr.addstr(y, at, item)
+    
+    text_type = 0
+    if i == ilist: text_type = curses.A_UNDERLINE
+    stdscr.addstr(1, at, items.name, text_type)
+      
+    for j, item in enumerate(items.items):
+      text_type = 0
+      if j == itemw and i == ilist: text_type = curses.A_BOLD
+      stdscr.addstr(j + 2, at, item, text_type)
     at += width + 2
 
 def new_item(stdscr, data, ilist):
