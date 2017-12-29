@@ -40,7 +40,7 @@ def new_item(stdscr, data, ilist):
 
 def new_list(stdscr, data, ilist):
   item_string = BarInput(stdscr, "Enter the name of the new list, then press enter: ")
-  data.append(List(st))
+  data.append(List(item_string))
   ilist = len(data) - 1
 
 
