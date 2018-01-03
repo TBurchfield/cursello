@@ -4,6 +4,7 @@ import curses
 from curses.textpad import rectangle
 import time
 
+from modules import storage
 from modules.list import List
 from modules.cursello_io import BarInput
 from modules.cursello_io import debug
@@ -47,11 +48,18 @@ def new_list(stdscr, data, ilist):
 def init(stdscr):
   stdscr.addstr(curses.LINES - 1, 0, "(q) to quit. (o) to add an item to a list. Vim style movement.", curses.A_BOLD)
 
+def handle_shutdown(data):
+  storage.write_store(data)
 
 def main(stdscr):
+  # Load/prepare storage.
+  storage_file_present = storage.check_store()
+  data = storage.load_store()
+  if data is None or len(data) == 0:
+    data = [List("To Do"), List("Done")]
+
   ilist = 0
   item = 0
-  data = [List("To Do"), List("Done")]
   while True:
     refresh_lists(stdscr, data, ilist, item)
     stdscr.refresh()
@@ -81,5 +89,7 @@ def main(stdscr):
       break
     else:
       pass
+
+  handle_shutdown(data)
 
 curses.wrapper(main)
