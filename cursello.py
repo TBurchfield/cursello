@@ -12,6 +12,7 @@ from modules.cursello_io import debug
 stdscr = curses.initscr()
 curses.noecho()
 curses.start_color()
+curses.curs_set(0)
 stdscr.refresh()
 
 def refresh_lists(stdscr, data, ilist, itemw):
@@ -21,11 +22,11 @@ def refresh_lists(stdscr, data, ilist, itemw):
     width = max(map(len, items.items) + [len(items.name)]) + 1
     #rectangle(stdscr, 0, at - 1, items.size + 2, at + width)
     rectangle(stdscr, 0, at - 1, items.size + 2, at + width)
-    
+
     text_type = 0
     if i == ilist: text_type = curses.A_UNDERLINE
     stdscr.addstr(1, at, items.name, text_type)
-      
+
     for j, item in enumerate(items.items):
       text_type = 0
       if j == itemw and i == ilist: text_type = curses.A_BOLD
