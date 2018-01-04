@@ -21,11 +21,11 @@ def refresh_lists(stdscr, data, ilist, itemw):
     width = max(map(len, items.items) + [len(items.name)]) + 1
     #rectangle(stdscr, 0, at - 1, items.size + 2, at + width)
     rectangle(stdscr, 0, at - 1, items.size + 2, at + width)
-    
+
     text_type = 0
     if i == ilist: text_type = curses.A_UNDERLINE
     stdscr.addstr(1, at, items.name, text_type)
-      
+
     for j, item in enumerate(items.items):
       text_type = 0
       if j == itemw and i == ilist: text_type = curses.A_BOLD
@@ -43,6 +43,18 @@ def new_list(stdscr, data, ilist):
   item_string = BarInput(stdscr, "Enter the name of the new list, then press enter: ")
   data.append(List(item_string))
   ilist = len(data) - 1
+
+
+def delete_item(stdscr, data, ilist, item):
+  answer = BarInput(stdscr, "Are you sure you wish to delete this item? (y/n): ")
+  if answer == 'y':
+    data[ilist].archive(item)
+
+
+def delete_list(stdscr, data, ilist):
+  answer = BarInput(stdscr, "Are you sure you wish to delete this entire list? (y/n): ")
+  if answer == 'y':
+    del data[ilist]
 
 
 def init(stdscr):
@@ -84,6 +96,12 @@ def main(stdscr):
     # Create new list
     elif c == ord('a'):
       new_list(stdscr, data, ilist)
+    # Delete Item
+    elif c == ord('d'):
+      delete_item(stdscr, data, ilist, item)
+    # Delete List
+    elif c == ord('D'):
+      delete_list(stdscr, data, ilist)
     # Quit
     elif c == ord('q'):
       break
