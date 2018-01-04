@@ -1,5 +1,6 @@
 # cursello
 Task tracking curses client.  Meant to be similar to [trello](https://trello.com).
+
 [cursello in action](https://asciinema.org/a/0JOBOGdB7Wuk7R8wHqXq9J1FS).
 
 ## Contributing
