@@ -46,6 +46,22 @@ def new_list(stdscr, data, ilist):
   ilist = len(data) - 1
 
 
+def delete_item(stdscr, data, ilist, item):
+  if ilist >= len(data) or ilist < 0 or item >= data[ilist].size or item < 0:
+    return
+  answer = BarInput(stdscr, "Are you sure you wish to delete this item? (y/n): ")
+  if answer == 'y':
+    data[ilist].archive(item)
+
+
+def delete_list(stdscr, data, ilist):
+  if ilist >= len(data) or ilist < 0:
+    return
+  answer = BarInput(stdscr, "Are you sure you wish to delete this entire list? (y/n): ")
+  if answer == 'y':
+    del data[ilist]
+
+
 def init(stdscr):
   stdscr.addstr(curses.LINES - 1, 0, "(q) to quit. (o) to add an item to a list. Vim style movement.", curses.A_BOLD)
 
@@ -85,6 +101,12 @@ def main(stdscr):
     # Create new list
     elif c == ord('a'):
       new_list(stdscr, data, ilist)
+    # Delete Item
+    elif c == ord('d'):
+      delete_item(stdscr, data, ilist, item)
+    # Delete List
+    elif c == ord('D'):
+      delete_list(stdscr, data, ilist)
     # Quit
     elif c == ord('q'):
       break
