@@ -3,6 +3,7 @@
 import curses
 from curses.textpad import rectangle
 import time
+import sys
 
 from modules import storage
 from modules.list import List
@@ -14,6 +15,14 @@ curses.noecho()
 curses.start_color()
 curses.curs_set(0)
 stdscr.refresh()
+
+if len(sys.argv) == 2:
+  # User has given board name
+  board_name = sys.argv[1]
+  if '.yaml' not in board_name:
+    board_name += '.yaml'
+
+  storage.STORAGE_FILE = board_name
 
 def refresh_lists(stdscr, data, ilist, itemw):
   stdscr.clear()
