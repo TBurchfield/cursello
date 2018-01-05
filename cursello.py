@@ -105,6 +105,8 @@ def switch_board(stdscr, data):
     if answer == 'y':
       save_board(stdscr, data)
 
+  changes_made = False
+
   board_name = BarInput(stdscr, 'Which board do you wish to switch to: ')
 
   if '.yaml' not in board_name:
