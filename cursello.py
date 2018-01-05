@@ -47,12 +47,16 @@ def new_list(stdscr, data, ilist):
 
 
 def delete_item(stdscr, data, ilist, item):
+  if ilist >= len(data) or ilist < 0 or item >= data[ilist].size or item < 0:
+    return
   answer = BarInput(stdscr, "Are you sure you wish to delete this item? (y/n): ")
   if answer == 'y':
     data[ilist].archive(item)
 
 
 def delete_list(stdscr, data, ilist):
+  if ilist >= len(data) or ilist < 0:
+    return
   answer = BarInput(stdscr, "Are you sure you wish to delete this entire list? (y/n): ")
   if answer == 'y':
     del data[ilist]
