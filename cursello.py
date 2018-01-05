@@ -71,6 +71,16 @@ def delete_list(stdscr, data, ilist):
     del data[ilist]
 
 
+def save_board(stdscr, data):
+  board_name = BarInput(stdscr, 'What name do you want to save this board as? Leave blank to save as: ' + storage.STORAGE_FILE.strip('.yaml'))
+
+  if '.yaml' not in board_name:
+    board_name += '.yaml'
+
+  storage.STORAGE_FILE = board_name
+  storage.write_store(data)
+
+
 def init(stdscr):
   stdscr.addstr(curses.LINES - 1, 0, "(q) to quit. (o) to add an item to a list. Vim style movement.", curses.A_BOLD)
 
@@ -116,6 +126,9 @@ def main(stdscr):
     # Delete List
     elif c == ord('D'):
       delete_list(stdscr, data, ilist)
+    # Save board
+    elif c == ord('w'):
+      save_board(stdscr, data)
     # Quit
     elif c == ord('q'):
       break
