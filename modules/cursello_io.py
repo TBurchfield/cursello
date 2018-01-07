@@ -35,16 +35,24 @@ OUTPUT:
 result:String - processed version of user's input
 '''
 def BarInput(screen, prompt):
-  screen.addstr(curses.LINES - 1, 0, prompt, curses.A_BOLD)
-  i = screen.getch()
-  screen.addstr(curses.LINES - 1, 0, " "*len(prompt), curses.A_BOLD)
-  st = chr(i)
-  while i != 10:
-    debug(screen, str(st), style=curses.A_UNDERLINE)
-    screen.refresh()
-    i = screen.getch()
-    if i < 256:
-      st += chr(i)
-  screen.addstr(curses.LINES - 1, 0, " "*len(prompt), curses.A_BOLD)
-  
+
+  screen_xy = screen.getmaxyx()
+
+  #Reactivate the cursor
+  curses.curs_set(1)
+  curses.echo()
+
+  # Display the prompt message
+  screen.addstr(screen_xy[0] - 1, 0, prompt, curses.A_BOLD)
+  screen.refresh()
+
+  # Get user input after the prompt message
+  st = screen.getstr(screen_xy[0] - 1, len(prompt))
+
+  # reset things
+  curses.curs_set(0)
+  curses.noecho()
+  screen.addstr(screen_xy[0] - 1, 0, ' ' * (screen_xy[1]-1))
+
+  # return string
   return st.strip()

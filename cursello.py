@@ -3,6 +3,7 @@
 import curses
 from curses.textpad import rectangle
 import time
+import sys
 
 from modules import storage
 from modules.list import List
@@ -14,6 +15,16 @@ curses.noecho()
 curses.start_color()
 curses.curs_set(0)
 stdscr.refresh()
+
+changes_made = False
+
+if len(sys.argv) == 2:
+  # User has given board name
+  board_name = sys.argv[1]
+  if '.yaml' not in board_name:
+    board_name += '.yaml'
+
+  storage.STORAGE_FILE = board_name
 
 def refresh_lists(stdscr, data, ilist, itemw):
   stdscr.clear()
@@ -36,17 +47,23 @@ def refresh_lists(stdscr, data, ilist, itemw):
 
 
 def new_item(stdscr, data, ilist):
+  global changes_made
+  changes_made = True
   item_string = BarInput(stdscr, "Enter the item description, then press enter: ")
   data[ilist].add(item_string)
 
 
 def new_list(stdscr, data, ilist):
+  global changes_made
+  changes_made = True
   item_string = BarInput(stdscr, "Enter the name of the new list, then press enter: ")
   data.append(List(item_string))
   ilist = len(data) - 1
 
 
 def delete_item(stdscr, data, ilist, item):
+  global changes_made
+  changes_made = True
   if ilist >= len(data) or ilist < 0 or item >= data[ilist].size or item < 0:
     return
   answer = BarInput(stdscr, "Are you sure you wish to delete this item? (y/n): ")
@@ -55,11 +72,54 @@ def delete_item(stdscr, data, ilist, item):
 
 
 def delete_list(stdscr, data, ilist):
+  global changes_made
+  changes_made = True
   if ilist >= len(data) or ilist < 0:
     return
   answer = BarInput(stdscr, "Are you sure you wish to delete this entire list? (y/n): ")
   if answer == 'y':
     del data[ilist]
+
+
+def save_board(stdscr, data):
+  global changes_made
+  board_name = BarInput(stdscr, 'What name do you want to save this board as? Leave blank to save as "' + storage.STORAGE_FILE.strip('.yaml') + '": ')
+
+  if not board_name == '':
+    if '.yaml' not in board_name:
+      board_name += '.yaml'
+
+    storage.STORAGE_FILE = board_name
+
+  storage.write_store(data)
+
+  changes_made = False
+
+
+def switch_board(stdscr, data):
+  global changes_made
+
+  if changes_made:
+    # User has unsaved changes, prompt to see if they wish to save
+    answer = BarInput(stdscr, 'You have unsaved changes in the current board, do you wish to save them? (y/n): ')
+    if answer == 'y':
+      save_board(stdscr, data)
+
+  changes_made = False
+
+  board_name = BarInput(stdscr, 'Which board do you wish to switch to: ')
+
+  if '.yaml' not in board_name:
+    board_name += '.yaml'
+
+  storage.STORAGE_FILE = board_name
+
+  storage_file_present = storage.check_store()
+  data = storage.load_store()
+  if data is None or len(data) == 0:
+    data = [List("To Do"), List("Done")]
+
+  return data
 
 
 def init(stdscr):
@@ -107,6 +167,14 @@ def main(stdscr):
     # Delete List
     elif c == ord('D'):
       delete_list(stdscr, data, ilist)
+    # Save board
+    elif c == ord('w'):
+      save_board(stdscr, data)
+    # Switch boards
+    elif c == ord('m'):
+      data = switch_board(stdscr, data)
+      ilist = 0
+      item = 0
     # Quit
     elif c == ord('q'):
       break
