@@ -135,11 +135,18 @@ def main(stdscr):
   if data is None or len(data) == 0:
     data = [List("To Do"), List("Done")]
 
+  yx = stdscr.getmaxyx()
+  pad = curses.newpad(yx[0], yx[1])
+  pad.refresh(0,0,0,0,yx[0]-1, yx[1]-1)
+  pad_pos_x = 0
+  pad_pos_y = 0
+
   ilist = 0
   item = 0
   while True:
-    refresh_lists(stdscr, data, ilist, item)
+    refresh_lists(pad, data, ilist, item)
     stdscr.refresh()
+    pad.refresh(pad_pos_y,pad_pos_x,0,0,yx[0]-1, yx[1]-1)
     c = stdscr.getch()
     # Move down within list
     if c == ord('j'):
@@ -157,27 +164,35 @@ def main(stdscr):
       item = min(item, data[ilist].size - 1)
     # Create new item in list
     elif c == ord('o'):
-      new_item(stdscr, data, ilist)
+      new_item(pad, data, ilist)
     # Create new list
     elif c == ord('a'):
-      new_list(stdscr, data, ilist)
+      new_list(pad, data, ilist)
     # Delete Item
     elif c == ord('d'):
-      delete_item(stdscr, data, ilist, item)
+      delete_item(pad, data, ilist, item)
     # Delete List
     elif c == ord('D'):
-      delete_list(stdscr, data, ilist)
+      delete_list(pad, data, ilist)
     # Save board
     elif c == ord('w'):
-      save_board(stdscr, data)
+      save_board(pad, data)
     # Switch boards
     elif c == ord('m'):
-      data = switch_board(stdscr, data)
+      data = switch_board(pad, data)
       ilist = 0
       item = 0
     # Quit
     elif c == ord('q'):
       break
+    elif c == curses.KEY_RIGHT and pad_pos_x < yx[1] - 1:
+      pad_pos_x += 1
+    elif c == curses.KEY_LEFT and pad_pos_x > 0:
+      pad_pos_x -= 1
+    elif c == curses.KEY_UP and pad_pos_y > 0:
+      pad_pos_y -= 1
+    elif c == curses.KEY_DOWN and pad_pos_y < yx[0] - 1:
+      pad_pos_y += 1
     else:
       pass
 

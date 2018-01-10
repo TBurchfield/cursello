@@ -44,7 +44,7 @@ def BarInput(screen, prompt):
 
   # Display the prompt message
   screen.addstr(screen_xy[0] - 1, 0, prompt, curses.A_BOLD)
-  screen.refresh()
+  screen.refresh(0,0, 0,0, screen.getmaxyx()[0]-1, screen.getmaxyx()[1]-1)
 
   # Get user input after the prompt message
   st = screen.getstr(screen_xy[0] - 1, len(prompt))
