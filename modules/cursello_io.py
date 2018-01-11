@@ -41,21 +41,20 @@ def BarInput(cursello, prompt):
   #Reactivate the cursor
   curses.curs_set(1)
   curses.echo()
-  screen.immedok(1)
 
   # Display the prompt message
-  screen.addstr(screen_yx[0] - 1, 0, prompt, curses.A_BOLD)
+  screen.addstr(screen_yx[0] - 1, 0, prompt)
   # screen.refresh(cursello.pad_pos_y,cursello.pad_pos_x, 0,0, screen_yx[0]-1, screen_yx[1]-1)
   screen.refresh()
+
   # Get user input after the prompt message
   st = screen.getstr(screen_yx[0] - 1, len(prompt))
 
   # reset things
   curses.curs_set(0)
   curses.noecho()
-  screen.immedok(0)
-  screen.addstr(screen_yx[0] - 1, 0, ' ' * (screen_yx[1]-1))
   screen.clear()
   screen.refresh()
+
   # return string
   return st.strip()

@@ -16,23 +16,26 @@ class Cursello:
   def __init__(self):
     self.win = curses.initscr()
 
-    yx = self.win.getmaxyx()
+    # Setup a new pad, arbitrary size values
     self.stdscr = curses.newpad(1000, 1000)
-    self.stdscr.keypad(1)
 
+    # Setup the configs for the screen
+    self.stdscr.keypad(1)
     curses.noecho()
     curses.start_color()
     curses.curs_set(0)
-    self.stdscr.refresh(0,0,0,0,yx[0]-1, yx[1]-1)
 
+    # Vars used for the board and screen movement
     self.pad_pos_x = 0
     self.pad_pos_y = 0
     self.data = {}
     self.ilist = 0
     self.item = 0
 
+    # Flag to indicate if user has made any changes
     self.changes_made = False
 
+    # Check if the user has provided a board as command line arg
     if len(sys.argv) == 2:
       # User has given board name
       board_name = sys.argv[1]
@@ -117,11 +120,11 @@ class Cursello:
       # User has unsaved changes, prompt to see if they wish to save
       answer = BarInput(self, 'You have unsaved changes in the current board, do you wish to save them? (y/n): ')
       if answer == 'y':
-        save_board(self.stdscr, self.data)
+        self.save_board()
 
     self.changes_made = False
 
-    board_name = BarInput(self.stdscr, 'Which board do you wish to switch to: ')
+    board_name = BarInput(self, 'Which board do you wish to switch to: ')
 
     if '.yaml' not in board_name:
       board_name += '.yaml'
@@ -132,6 +135,11 @@ class Cursello:
     self.data = storage.load_store()
     if self.data is None or len(self.data) == 0:
       self.data = [List("To Do"), List("Done")]
+
+    self.ilist = 0
+    self.item = 0
+    self.pad_pos_x = 0
+    self.pad_pos_y = 0
 
     return self.data
 
@@ -153,13 +161,16 @@ class Cursello:
     self.stdscr.refresh(0,0,0,0,yx[0]-1, yx[1]-1)
 
     while True:
+
+      # Update board from pervious loop
       self.refresh_lists()
+
+      # Update the screen
       self.stdscr.refresh(self.pad_pos_y,self.pad_pos_x,0,0,yx[0]-1, yx[1]-1)
+
+      # Get user input
       c = self.stdscr.getch()
-      l = open('log', 'w+')
-      l.write(str(c))
-      l.flush()
-      l.close()
+
       # Move down within list
       if c == ord('j'):
         self.item = min(self.item + 1, self.data[self.ilist].size - 1)
@@ -197,12 +208,16 @@ class Cursello:
       # Quit
       elif c == ord('q'):
         break
+      # Move the view to the right
       elif c == curses.KEY_RIGHT and self.pad_pos_x < yx[1] - 1:
         self.pad_pos_x += 1
+      # Move the view to the left
       elif c == curses.KEY_LEFT and self.pad_pos_x > 0:
         self.pad_pos_x -= 1
+      # Move the view upwards
       elif c == curses.KEY_UP and self.pad_pos_y > 0:
         self.pad_pos_y -= 1
+      # Move the view downwards
       elif c == curses.KEY_DOWN and self.pad_pos_y < yx[0] - 1:
         self.pad_pos_y += 1
       else:
