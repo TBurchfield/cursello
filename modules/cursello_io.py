@@ -7,7 +7,6 @@ Douglas J. Smith
 12/28/17
 '''
 import curses
-
 '''
 debug - take a string and a screen and display the string at the base of the
   window, useful for alerts or certain I/O display.
@@ -34,25 +33,28 @@ prompt:String - string that is used to request input. Prompt is flashed before
 OUTPUT:
 result:String - processed version of user's input
 '''
-def BarInput(screen, prompt):
+def BarInput(cursello, prompt):
+  screen = cursello.win
 
-  screen_xy = screen.getmaxyx()
+  screen_yx = screen.getmaxyx()
 
   #Reactivate the cursor
   curses.curs_set(1)
   curses.echo()
 
   # Display the prompt message
-  screen.addstr(screen_xy[0] - 1, 0, prompt, curses.A_BOLD)
+  screen.addstr(screen_yx[0] - 1, 0, prompt)
+  # screen.refresh(cursello.pad_pos_y,cursello.pad_pos_x, 0,0, screen_yx[0]-1, screen_yx[1]-1)
   screen.refresh()
 
   # Get user input after the prompt message
-  st = screen.getstr(screen_xy[0] - 1, len(prompt))
+  st = screen.getstr(screen_yx[0] - 1, len(prompt))
 
   # reset things
   curses.curs_set(0)
   curses.noecho()
-  screen.addstr(screen_xy[0] - 1, 0, ' ' * (screen_xy[1]-1))
+  screen.clear()
+  screen.refresh()
 
   # return string
   return st.strip()
